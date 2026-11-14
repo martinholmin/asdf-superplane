@@ -8,7 +8,7 @@ Versions drop the tag prefix: `1.0.0-rc1` is tag `cli/v1.0.0-rc1`, `0.29.0` is `
 The upstream install script's "latest" still redirects to 0.29.0, which predates the 1.x server.
 
 ```sh
-asdf plugin add superplane ~/Code/martinholmin/asdf-superplane
+asdf plugin add superplane https://github.com/martinholmin/asdf-superplane
 asdf install superplane 1.0.0-rc1
 asdf set -u superplane 1.0.0-rc1
 ```
