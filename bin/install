@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+source "$(dirname "$0")/../lib/utils.bash"
+mkdir -p "${ASDF_INSTALL_PATH}/bin"
+install -m 755 "${ASDF_DOWNLOAD_PATH}/superplane" "${ASDF_INSTALL_PATH}/bin/superplane"
+"${ASDF_INSTALL_PATH}/bin/superplane" --help >/dev/null || fail "installed binary does not run"
