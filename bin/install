@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck source=SCRIPTDIR/../lib/utils.bash
 source "$(dirname "$0")/../lib/utils.bash"
 mkdir -p "${ASDF_INSTALL_PATH}/bin"
 install -m 755 "${ASDF_DOWNLOAD_PATH}/superplane" "${ASDF_INSTALL_PATH}/bin/superplane"

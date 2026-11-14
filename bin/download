@@ -1,21 +1,34 @@
 #!/usr/bin/env bash
+# shellcheck source=SCRIPTDIR/../lib/utils.bash
 source "$(dirname "$0")/../lib/utils.bash"
 
 [ "${ASDF_INSTALL_TYPE:-version}" = version ] || fail "only released versions are supported"
 version="$ASDF_INSTALL_VERSION"
-tag="$(tag_for "$version")"
-asset="superplane-cli-$(platform)"
 dest="${ASDF_DOWNLOAD_PATH}/superplane"
+mkdir -p "$ASDF_DOWNLOAD_PATH"
 
-curl "${curl_opts[@]}" -o "$dest" "${GH_RELEASES}/${tag}/${asset}" ||
-  fail "could not download ${asset} for ${tag}"
+tag="" asset=""
+while read -r candidate_tag candidate_asset; do
+  if curl "${curl_opts[@]}" -o "$dest" "${GH_RELEASES}/${candidate_tag}/${candidate_asset}" 2>/dev/null; then
+    tag="$candidate_tag" asset="$candidate_asset"
+    break
+  fi
+done < <(release_candidates "$version" "$(platform)")
+[ -n "$tag" ] ||
+  fail "no superplane CLI binary for version ${version} on $(platform); see 'asdf list all superplane'"
 
-# Verify against the release's checksums.txt. Older releases (0.x) ship none: warn.
+# Verify against the release's checksums.txt. Releases before 1.0.0-rc1 ship none: warn.
 if sums="$(curl "${curl_opts[@]}" "${GH_RELEASES}/${tag}/checksums.txt" 2>/dev/null)"; then
-  want="$(awk -v a="$asset" '$2 == a { print $1 }' <<<"$sums")"
-  [ -n "$want" ] || fail "${asset} missing from checksums.txt of ${tag}"
+  want="$(awk -v a="$asset" '$2 == a || $2 == "*" a { print $1 }' <<<"$sums")"
+  [ -n "$want" ] || {
+    rm -f "$dest"
+    fail "${asset} missing from checksums.txt of ${tag}"
+  }
   got="$(sha256 "$dest")"
-  [ "$want" = "$got" ] || { rm -f "$dest"; fail "checksum mismatch for ${asset}: want ${want}, got ${got}"; }
+  [ "$want" = "$got" ] || {
+    rm -f "$dest"
+    fail "checksum mismatch for ${asset}: want ${want}, got ${got}"
+  }
   echo "Verified ${asset} (${tag}) sha256 ${got}"
 else
   echo "Warning: ${tag} publishes no checksums.txt; ${asset} is unverified" >&2

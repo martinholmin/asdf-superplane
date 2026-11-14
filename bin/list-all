@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck source=SCRIPTDIR/../lib/utils.bash
 source "$(dirname "$0")/../lib/utils.bash"
 list_versions | tr '\n' ' '
 echo

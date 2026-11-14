@@ -1,0 +1,35 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    # Weekly, to catch upstream release-layout changes.
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  plugin_test:
+    name: asdf plugin test (${{ matrix.version }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        version:
+          # One per upstream release layout, oldest to newest; see lib/utils.bash.
+          - 0.1.3
+          - 0.30.0
+          - 1.0.0-rc1
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: asdf_plugin_test
+        uses: asdf-vm/actions/plugin-test@v4
+        with:
+          version: ${{ matrix.version }}
+          command: superplane --help
