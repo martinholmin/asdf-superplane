@@ -23,7 +23,7 @@ for r in json.load(sys.stdin):
     t = r["tag_name"]
     if t.startswith("cli/v"): print(t[5:])
     elif t.startswith("v"): print(t[1:])
-' | sort -V
+' | sort -uV
 }
 
 tag_for() {

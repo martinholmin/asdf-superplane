@@ -14,3 +14,6 @@ asdf set -u superplane 1.0.0-rc1
 ```
 
 Set `GITHUB_API_TOKEN` if `list-all` hits the GitHub API rate limit.
+
+Caveat: `1.0.0-rc2` (server tag `v1.0.0-rc2`) sorts after `1.0.0-rc1` but is the older build;
+`1.0.0-rc1` resolves to `cli/v1.0.0-rc1`, the newest CLI as of 2026-11-14.
